@@ -20,6 +20,13 @@ resource "aws_security_group" "WPSG" {
     to_port = 80
     protocol = "tcp"
   } 
+   ingress {
+    cidr_blocks = [ "0.0.0.0/0" ]
+    description = "allow ftp"
+    from_port = 1024
+    to_port = 1048
+    protocol = "tcp"
+  } 
   egress{
     cidr_blocks = [ "0.0.0.0/0" ]
     description = "permit all"
@@ -38,7 +45,7 @@ resource "aws_instance" "wordpressfrontend" {
   tags = {
     app = "wordpress"
     role = "frontend"
-   user_data_base64 = "${data.cloudinit_config.wordpress.rendered}"
+   user_data= "${data.cloudinit_config.wordpress.rendered}"
   }
 }
 resource "aws_eip" "wpip" {
@@ -71,8 +78,8 @@ resource "aws_db_instance" "wordpressbackend" {
 }
 
 data "cloudinit_config" "wordpress" {
-  gzip          = true
-  base64_encode = true
+  gzip          = false
+  base64_encode = false
 
   part {
     content_type = "text/x-shellscript"
